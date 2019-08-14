@@ -1,0 +1,1 @@
+Install resource files here before use.
