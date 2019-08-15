@@ -58,7 +58,7 @@ def main():
         nb_docs += 1
         nb_paras += len(doc.extract_body_paragraphs())
         for para in doc.extract_body_paragraphs():
-            for tok in re.split(r'\s|,|;|:|"', para):  # very rougly, no tokenizer
+            for tok in re.split(r'\s|,|;|:|"', para):  # very roughly, no tokenizer
                 if tok:
                     nb_toks += 1
 
