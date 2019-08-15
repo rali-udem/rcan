@@ -1,1 +1,1 @@
-Install resource files here before use.
+Unzip file `/data/rali6/sans-bkp/gottif/radiocan/data/api-resource-files.zip` in this directory before use.
