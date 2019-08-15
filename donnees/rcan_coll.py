@@ -4,6 +4,8 @@ Atelier de résolution de problèmes industriels 2019.
 (c) RALI, Université de Montréal.
 Fabrizio Gotti - gottif.
 """
+import sys
+
 from bs4 import BeautifulSoup
 import lxml
 import orjson
@@ -133,7 +135,12 @@ class RDocument:
 
 
 def load_resources():
-    with open(os.path.join(_res_path, 'themes.tsv'), encoding='utf-8') as fin:
+    theme_file_name = os.path.join(_res_path, 'themes.tsv')
+    if not os.path.exists(theme_file_name):
+        print("Install the resource files in the resources dir before using this API. Read README.md", file=sys.stderr)
+        sys.exit(1)
+
+    with open(theme_file_name, encoding='utf-8') as fin:
         for line in fin:
             parts = line.split('\t')
             _theme_dict[int(parts[0])] = {'id': int(parts[0]), 'name': parts[1],
