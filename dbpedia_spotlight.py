@@ -1,4 +1,4 @@
-"""Adds the field body_paragraphs to all json files in the coll."""
+"""Extracts entities from DBPedia Spotlight."""
 import os
 import requests
 import sys
