@@ -6,7 +6,7 @@ from donnees.rcan_coll import *
 
 
 def main():
-    coll = RCollection('/data/rali6/Tmp/gottif/radiocan/data/articles_ici.radiocanada.ca-extracted/')
+    coll = RCollection('/data/rali6/Tmp/gottif/radiocan/data/radio-can-articles/')
     # A directory on your local machine will improve performance tenfold!
 
     for doc in coll.find():
