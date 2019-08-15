@@ -86,17 +86,24 @@ class RDocument:
         if 'BodyParagraphs' in self._d:
             result = self._d['BodyParagraphs']
         else:
-            # create an html of the full document, then parse
-            full_html = '<div>' + self._d.get('Lead', '') + '</div> \n<div>' + self._d.get('Body', '') + '</div>'
-            soup = BeautifulSoup(full_html, "lxml")
+            result = self._extract_body_paragraphs()
 
-            # remove copyright holders in figures, scripts, styles
-            for n in soup.select('span.creator, span.copyrightHolder, script, noscript, style'):
-                n.decompose()
+            # cache result
+            self._d['BodyParagraphs'] = result
 
-            # create text version
-            result = [x for x in soup.get_text().split('\n') if len(x.strip()) > 1]
+        return result
 
+    def _extract_body_paragraphs(self):
+        # create an html of the full document, then parse
+        full_html = '<div>' + self._d.get('Lead', '') + '</div> \n<div>' + self._d.get('Body', '') + '</div>'
+        soup = BeautifulSoup(full_html, "lxml")
+
+        # remove copyright holders in figures, scripts, styles
+        for n in soup.select('span.creator, span.copyrightHolder, script, noscript, style'):
+            n.decompose()
+
+        # create text version
+        result = [x for x in soup.get_text().split('\n') if len(x.strip()) > 1]
         return result
 
     @property
