@@ -1,1 +1,4 @@
 .idea
+/donnees/resources/subthemes.tsv
+/donnees/resources/theme_soustheme_relationship.json
+/donnees/resources/themes.tsv
