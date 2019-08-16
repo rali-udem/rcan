@@ -152,7 +152,7 @@ class RDocument:
 
 def load_resources():
     theme_file_name = os.path.join(_res_path, 'themes.tsv')
-    if os.path.exists(theme_file_name):
+    if not os.path.exists(theme_file_name):
         print(f"Install the resource files in the dir {_res_path} before using this API.\n"
               f"See {os.path.join(_res_path, 'README.md')} for details.", file=sys.stderr)
         sys.exit(1)
