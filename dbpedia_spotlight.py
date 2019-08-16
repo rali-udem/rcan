@@ -1,5 +1,7 @@
 """Extracts entities from DBPedia Spotlight."""
 import os
+from http.client import RemoteDisconnected
+
 import requests
 import sys
 
@@ -22,22 +24,23 @@ def main():
             if nb_docs % 1000 == 0:
                 print(nb_docs)
 
-            try:
-                paras = doc.extract_body_paragraphs()
-                output_file = os.path.join(out_dir, os.path.basename(doc['source_file']))
+            paras = doc.extract_body_paragraphs()
+            text = '\n'.join(paras).replace('<', ' ')
+            output_file = os.path.join(out_dir, os.path.basename(doc['source_file']))
 
-                if paras:
-                    text = '\n'.join(paras).replace('<', ' ')
-                    response = session.post(url, {'text': text, 'confidence': 0.4, 'support': -1},
-                                            headers={'Accept': 'application/json'},)
-                    response.raise_for_status()
-                    with open(output_file, 'wb') as fout:
-                        fout.write(response.content)
-                else:
-                    open(output_file, 'w', encoding='utf-8').write('{ "notext": true }')
+            if not os.path.exists(output_file):
+                try:
+                    if paras and 'amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;' not in text:
+                        response = session.post(url, {'text': text, 'confidence': 0.4, 'support': -1},
+                                                headers={'Accept': 'application/json'},)
+                        response.raise_for_status()
+                        with open(output_file, 'wb') as fout:
+                            fout.write(response.content)
+                    else:
+                        open(output_file, 'w', encoding='utf-8').write('{ "notext": true }')
 
-            except HTTPError as e:
-                print(f"Problem with {doc['source_file']}: {e}", file=sys.stderr)
+                except HTTPError as e:
+                    print(f"Problem with {doc['source_file']}: {e}", file=sys.stderr)
 
 
 if __name__ == '__main__':
