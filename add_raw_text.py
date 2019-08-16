@@ -18,7 +18,7 @@ def main():
             print(nb_docs)
 
         try:
-            doc._d['BodyParagraphs'] = doc.extract_body_paragraphs()
+            paras = doc.extract_body_paragraphs()  # This will populate the BodyParagraphs field in the dict
             doc.write_to(os.path.join(out_dir, os.path.basename(doc['source_file'])))
         except:
             print(f"Problem with {doc['source_file']}: {sys.exc_info()[0]}", file=sys.stderr)
