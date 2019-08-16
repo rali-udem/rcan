@@ -42,10 +42,16 @@ class RCollection:
             def __next__(self):
                 next_file_entry = next(self.scan_it)
                 next_file = os.path.join(self.dir, next_file_entry.name)
-                result = orjson.loads(open(next_file, 'r', encoding='utf-8').read())
-                result['source_file'] = next_file
 
-                return RDocument(result)
+                doc = None
+                try:
+                    result = orjson.loads(open(next_file, 'r', encoding='utf-8').read())
+                    result['source_file'] = next_file
+                    doc = RDocument(result)
+                except:
+                    print("Problem reading file " + next_file)
+
+                return doc
 
         return RCollectionIt(self.col_spec)
 
@@ -96,16 +102,26 @@ class RDocument:
         return result
 
     def _extract_body_paragraphs(self):
+        # guess the document type
+        ledevoirdoc = 'ledevoir' in self.url
+
         # create an html of the full document, then parse
         full_html = '<div>' + self._d.get('Lead', '') + '</div> \n<div>' + self._d.get('Body', '') + '</div>'
         soup = BeautifulSoup(full_html, "lxml")
 
-        # remove copyright holders in figures, scripts, styles
-        for n in soup.select('span.creator, span.copyrightHolder, script, noscript, style'):
-            n.decompose()
+        if ledevoirdoc:
+            # remove
+            for n in soup.select('script, noscript, style'):
+                n.decompose()
+            # create text version
+            result = [x.strip() for x in soup.get_text().split('\n') if len(x.strip()) > 1]
+        else:  # radio-canada
+            # remove copyright holders in figures, scripts, styles
+            for n in soup.select('span.creator, span.copyrightHolder, script, noscript, style'):
+                n.decompose()
+            # create text version
+            result = [x for x in soup.get_text().split('\n') if len(x.strip()) > 1]
 
-        # create text version
-        result = [x for x in soup.get_text().split('\n') if len(x.strip()) > 1]
         return result
 
     @property
