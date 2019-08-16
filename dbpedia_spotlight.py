@@ -1,10 +1,7 @@
 """Extracts entities from DBPedia Spotlight."""
+
 import os
-from http.client import RemoteDisconnected
-
 import requests
-import sys
-
 from requests import HTTPError
 
 from donnees.rcan_coll import *
