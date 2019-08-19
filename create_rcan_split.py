@@ -27,7 +27,7 @@ def valid_subthemes(subthemes):
 
 def write_subset(sublist, fout_name):
     with open(fout_name, 'w') as fout:
-        for id in sublist:
+        for id in sorted(sublist):
             print(id, file=fout)
 
 
