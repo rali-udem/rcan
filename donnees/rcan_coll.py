@@ -159,15 +159,18 @@ def load_resources():
 
     with open(theme_file_name, encoding='utf-8') as fin:
         for line in fin:
-            parts = line.split('\t')
+            parts = line.strip().split('\t')
             _theme_dict[int(parts[0])] = {'id': int(parts[0]), 'name': parts[1],
                                           'codename': parts[2], 'active': parts[3] == '1', 'subthemes': []}
 
     with open(os.path.join(_res_path, 'subthemes.tsv'), encoding='utf-8') as fin:
         for line in fin:
-            parts = line.split('\t')
-            _subtheme_dict[int(parts[0])] = {'id': int(parts[0]), 'name': parts[1], 'codename': parts[2],
-                                             'active': parts[3] == '1', 'comment': parts[4], 'theme': []}
+            clean_line = line.strip()
+            if clean_line:
+                parts = clean_line.split('\t')
+                _subtheme_dict[int(parts[0])] = {'id': int(parts[0]), 'name': parts[1], 'codename': parts[2],
+                                                 'active': parts[3] == '1',
+                                                 'comment': parts[4] if len(parts) >= 5 else '', 'theme': []}
 
     rels = orjson.loads(open(os.path.join(_res_path, 'theme_soustheme_relationship.json'), 'r', encoding='utf-8').read())
     for theme in rels:
