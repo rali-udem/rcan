@@ -1,5 +1,6 @@
 import math
 import os
+import pickle
 import random
 import sys
 
@@ -35,6 +36,7 @@ def main():
     coll_dir = sys.argv[1]
     out_dir = sys.argv[2]
     coll = RCollection(coll_dir)
+    reference = {}
 
     good_article_ids = set()
     nb_bad_articles = 0
@@ -43,8 +45,10 @@ def main():
         nb_docs += 1
         if nb_docs % 1000 == 0:
             print(f"{nb_docs}...")
+
         if valid_theme(doc.theme) and valid_subthemes(doc.subthemes):
             good_article_ids.add(doc.id)
+            reference[doc.id] = [doc.theme['id']] + [x['id'] for x in doc.subthemes]
         else:
             nb_bad_articles += 1
 
@@ -64,6 +68,7 @@ def main():
     write_subset(good_ids[0:valid_split], os.path.join(out_dir, 'train.ids'))
     write_subset(good_ids[valid_split:test_split], os.path.join(out_dir, 'valid.ids'))
     write_subset(good_ids[test_split:], os.path.join(out_dir, 'test.ids'))
+    pickle.dump(reference, open(os.path.join(out_dir, 'ref-themes.pkl'), 'wb'))
 
 
 if __name__ == '__main__':
