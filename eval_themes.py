@@ -99,10 +99,11 @@ def main():
         print("Usage: prog predictions.json", file=sys.stderr)
         sys.exit(1)
 
+    print("Loading...", end='\n\n', file=sys.stderr, flush=True)
     preds = orjson.loads(open(sys.argv[1], 'r', encoding='utf-8').read())
     theme_refs = pickle.load(bz2.open(os.path.join(_ref_path, 'ref-rcan-themes.pkl.bz2'), 'rb'))
 
-    first_eval = preds[list(preds.keys)[0]]
+    first_eval = preds[list(preds.keys())[0]]
 
     if 'theme' in first_eval:
         eval_res_th = evaluate_themes(preds, theme_refs, range(1, 6), 'theme')
