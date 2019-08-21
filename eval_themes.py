@@ -1,7 +1,5 @@
 """Evaluates themes/subthemes"""
 import bz2
-from pprint import pprint
-
 import orjson
 import os
 import pickle
@@ -15,12 +13,23 @@ def inter_card(lista, listb):
     """Computes the cardinality of the intersection of two lists."""
     seta = set(lista)
     result = len([x for x in listb if x in seta])
-    print(lista, listb, result)
     return result
 
 
 def f1(r, p):
     return 2 * r * p / (r + p)
+
+
+def toggle_type(id):
+    if type(id) == int:
+        result = str(id)
+    elif type(id) == str:
+        try:
+            result = int(id)
+        except ValueError as e:
+            result = id
+
+    return result
 
 
 def evaluate_themes(pred_dict, refs, n_list, run):
@@ -42,13 +51,17 @@ def evaluate_themes(pred_dict, refs, n_list, run):
         nb_valid_elements = 0
 
         for doc_id, preds in pred_dict.items():
-            if doc_id not in refs:
-                print(f"Cannot find your predicted doc id {doc_id} in the reference. Make sure "
-                      f"you use ints for doc_id's and theme id's, not strings.", file=sys.stderr)
-                sys.exit(1)
+            if doc_id in refs:
+                effective_doc_id = doc_id
+            else:
+                effective_doc_id = toggle_type(doc_id)
+                if effective_doc_id not in refs:
+                    print(f"Cannot find your predicted doc id {doc_id} in the reference. Make sure "
+                          f"you use ints for doc_id's and theme id's, not strings.", file=sys.stderr)
+                    sys.exit(1)
 
-            ref_theme = refs[doc_id][0]
-            ref_subthemes = refs[doc_id][1:]
+            ref_theme = refs[effective_doc_id][0]
+            ref_subthemes = refs[effective_doc_id][1:]
 
             if run == 'theme':
                 predicted_elements = [x[0] for x in preds['theme'][0:n]]
