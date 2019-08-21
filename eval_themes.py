@@ -91,6 +91,7 @@ def print_eval_metrics(eval_res):
         rows.append([str(n), f"{infos['p']:.3f}", f"{infos['r']:.3f}", f"{infos['f1']:.3f}"],)
 
     print(tabulate.tabulate(rows, headers=["n", "p", "r", "f1"], tablefmt="simple"))
+    print()
 
 
 def main():
@@ -101,21 +102,17 @@ def main():
     preds = orjson.loads(open(sys.argv[1], 'r', encoding='utf-8').read())
     theme_refs = pickle.load(bz2.open(os.path.join(_ref_path, 'ref-rcan-themes.pkl.bz2'), 'rb'))
 
-    # preds = {}
-    # for fid in list(theme_refs.keys())[0:100]:
-    #     preds[fid] = {'theme': [(theme_refs[fid][0], 0), (theme_refs[fid][0] + 1, 0)],
-    #                   'sub_themes': [(theme_refs[fid][1], 0), (theme_refs[fid][1] + 1, 0)]}
+    first_eval = preds[list(preds.keys)[0]]
 
-    eval_res_th = evaluate_themes(preds, theme_refs, range(1, 6), 'theme')
-    eval_res_sth = evaluate_themes(preds, theme_refs, range(1, 6), 'sub_themes')
+    if 'theme' in first_eval:
+        eval_res_th = evaluate_themes(preds, theme_refs, range(1, 6), 'theme')
+        print(f"Themes ====================")
+        print_eval_metrics(eval_res_th)
 
-    # output results on stdout
-    print(f"Themes ====================")
-    print_eval_metrics(eval_res_th)
-    print()
-
-    print(f"SubThemes =================")
-    print_eval_metrics(eval_res_sth)
+    if 'sub_themes' in first_eval:
+        eval_res_sth = evaluate_themes(preds, theme_refs, range(1, 6), 'sub_themes')
+        print(f"SubThemes =================")
+        print_eval_metrics(eval_res_sth)
 
 
 if __name__ == '__main__':
