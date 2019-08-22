@@ -36,15 +36,17 @@ def main():
             row['preds'].append(pred_theme)
             rows[doc_id] = row
 
-    print('\t'.join(["doc_id", "url", "ref", "unanimity"] + sys_names))
+    print('\t'.join(["doc_id", "url", "ref", "unanimity", "all_valid"] + sys_names))
     for raw_doc_id in sorted(rows.keys()):
         l = []
         doc_id = int(raw_doc_id)
         cur_row = rows[doc_id]
-        unanimity = len(cur_row['preds']) == len(set(cur_row['preds']))
+
+        unanimity = len(set(cur_row['preds'])) == 1
+        all_valid = unanimity and cur_row['preds'][0] == cur_row['ref_theme']
 
         l.extend([str(raw_doc_id), cur_row['url'], rcan_coll.get_theme(cur_row['ref_theme'])['name']])
-        l.append("True" if unanimity else "False")
+        l.extend([str(unanimity), str(all_valid)])
         l.extend([rcan_coll.get_theme(x)['name'] for x in cur_row['preds']])
         print('\t'.join(l))
 
