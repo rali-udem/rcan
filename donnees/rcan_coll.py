@@ -150,6 +150,14 @@ class RDocument:
             fout.write(orjson.dumps(self._d))
 
 
+def get_theme(theme_id):
+    return _theme_dict[int(theme_id)]
+
+
+def get_subtheme(stheme_id):
+    return _subtheme_dict[int(stheme_id)]
+
+
 def load_resources():
     theme_file_name = os.path.join(_res_path, 'themes.tsv')
     if not os.path.exists(theme_file_name):
