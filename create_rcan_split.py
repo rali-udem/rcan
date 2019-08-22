@@ -35,6 +35,13 @@ def write_subset(sublist, fout_name):
 def main():
     coll_dir = sys.argv[1]
     out_dir = sys.argv[2]
+    validate_subthemes = sys.argv[3] == 'valid_themes_and_subthemes'
+
+    if validate_subthemes:
+        print("Themes and subthemes must be valid")
+    else:
+        print("Only themes must be valid")
+
     coll = RCollection(coll_dir)
     reference = {}
 
@@ -46,7 +53,7 @@ def main():
         if nb_docs % 1000 == 0:
             print(f"{nb_docs}...")
 
-        if valid_theme(doc.theme) and valid_subthemes(doc.subthemes):
+        if valid_theme(doc.theme) and (not validate_subthemes or valid_subthemes(doc.subthemes)):
             good_article_ids.add(doc.id)
             reference[doc.id] = [doc.theme['id']] + [x['id'] for x in doc.subthemes]
         else:
