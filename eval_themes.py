@@ -32,6 +32,20 @@ def toggle_type(id):
     return result
 
 
+def update_label_stats(by_label_stats, reference_elements, predicted_elements):
+    for ref in reference_elements:
+        stat = by_label_stats.get(ref, {'ref': 0, 'pred': 0, 'valid': 0})
+        stat['ref'] += 1
+        if ref in predicted_elements:
+            stat['valid'] += 1
+        by_label_stats[ref] = stat
+
+    for pred in predicted_elements:
+        stat = by_label_stats.get(pred, {'ref': 0, 'pred': 0, 'valid': 0})
+        stat['pred'] += 1
+        by_label_stats[pred] = stat
+
+
 def evaluate_themes(pred_dict, refs, n_list, run):
     """
     Eval.
@@ -45,6 +59,7 @@ def evaluate_themes(pred_dict, refs, n_list, run):
 
     for n in n_list:
         cur_res = result[n] = {}
+        by_label_stats = {}
 
         nb_ref_elements = 0
         nb_predicted_elements = 0
@@ -73,11 +88,13 @@ def evaluate_themes(pred_dict, refs, n_list, run):
             nb_ref_elements += len(reference_elements)
             nb_predicted_elements += len(predicted_elements)
             nb_valid_elements += inter_card(predicted_elements, reference_elements)
+            update_label_stats(by_label_stats, reference_elements, predicted_elements)
 
         cur_res[run] = {}
         cur_res[run]['r'] = nb_valid_elements / nb_ref_elements
         cur_res[run]['p'] = nb_valid_elements / nb_predicted_elements
         cur_res[run]['f1'] = f1(cur_res[run]['r'], cur_res[run]['p'])
+        cur_res[run]['by_label'] = by_label_stats
 
     return result
 
@@ -92,6 +109,23 @@ def print_eval_metrics(eval_res):
 
     print(tabulate.tabulate(rows, headers=["n", "p", "r", "f1"], tablefmt="simple"))
     print()
+
+
+def print_eval_metrics_by_class(eval_res, run_name, n):
+    if n in eval_res:
+        rows = []
+
+        label_stats = eval_res[n][run_name]['by_label']
+        for label in sorted(list(label_stats.keys())):
+            info = label_stats[label]
+
+            precision = f"{info['valid'] / info['pred']:.3f}" if info['pred'] else 'n.a.'
+            recall = f"{info['valid'] / info['ref']:.3f}" if info['ref'] else 'n.a.'
+            fmeas = f1(info['valid'] / info['ref'], info['valid'] / info['pred']) if info['pred'] and info['ref'] and info['valid'] else 0
+
+            rows.append([str(label), precision, recall, f"{fmeas:.3f}"])
+
+        print(tabulate.tabulate(rows, headers=["label", "p", "r", "f1"], tablefmt="simple"))
 
 
 def main():
@@ -109,11 +143,13 @@ def main():
         eval_res_th = evaluate_themes(preds, theme_refs, range(1, 6), 'theme')
         print(f"Themes ====================")
         print_eval_metrics(eval_res_th)
+        print_eval_metrics_by_class(eval_res_th, 'theme', 1)
 
     if 'sub_themes' in first_eval:
         eval_res_sth = evaluate_themes(preds, theme_refs, range(1, 6), 'sub_themes')
         print(f"SubThemes =================")
-        print_eval_metrics(eval_res_sth)
+        print_eval_metrics(eval_res_sth, 1)
+        print_eval_metrics_by_class(eval_res_th, 'theme', 1)
 
 
 if __name__ == '__main__':
