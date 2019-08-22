@@ -32,16 +32,24 @@ def toggle_type(id):
     return result
 
 
+def update_confusion(freq_dict, predicted_elements):
+    for el in predicted_elements:
+        cur_freq = freq_dict.get(el, 0) + 1
+        freq_dict[el] = cur_freq
+
+
 def update_label_stats(by_label_stats, reference_elements, predicted_elements):
     for ref in reference_elements:
-        stat = by_label_stats.get(ref, {'ref': 0, 'pred': 0, 'valid': 0})
+        stat = by_label_stats.get(ref, {'ref': 0, 'pred': 0, 'valid': 0, 'confused_with': {}})
         stat['ref'] += 1
         if ref in predicted_elements:
             stat['valid'] += 1
+        else:
+            update_confusion(stat['confused_with'], predicted_elements)
         by_label_stats[ref] = stat
 
     for pred in predicted_elements:
-        stat = by_label_stats.get(pred, {'ref': 0, 'pred': 0, 'valid': 0})
+        stat = by_label_stats.get(pred, {'ref': 0, 'pred': 0, 'valid': 0, 'confused_with': {}})
         stat['pred'] += 1
         by_label_stats[pred] = stat
 
@@ -123,9 +131,13 @@ def print_eval_metrics_by_class(eval_res, run_name, n):
             recall = f"{info['valid'] / info['ref']:.3f}" if info['ref'] else 'n.a.'
             fmeas = f1(info['valid'] / info['ref'], info['valid'] / info['pred']) if info['pred'] and info['ref'] and info['valid'] else 0
 
-            rows.append([str(label), precision, recall, f"{fmeas:.3f}"])
+            confused_with = sorted(list(info['confused_with'].keys()), key=lambda x: info['confused_with'][x], reverse=True)
+            sum_confused = sum(info['confused_with'].values())
+            confusion_text = ' '.join([f"{x} ({100*info['confused_with'][x]/sum_confused:.0f}%)" for x in confused_with])
 
-        print(tabulate.tabulate(rows, headers=["label", "p", "r", "f1"], tablefmt="simple"))
+            rows.append([str(label), precision, recall, f"{fmeas:.3f}", confusion_text])
+
+        print(tabulate.tabulate(rows, headers=["label", "p", "r", "f1", "confused with"], tablefmt="simple"))
 
 
 def main():
@@ -150,7 +162,7 @@ def main():
         eval_res_sth = evaluate_themes(preds, theme_refs, range(1, 6), 'sub_themes')
         print(f"SubThemes =================")
         print_eval_metrics(eval_res_sth, 1)
-        print(f"By label @1 ----------------")
+        print(f"By label @1 ---------------")
         print_eval_metrics_by_class(eval_res_sth, 'sub_themes', 1)
 
 
