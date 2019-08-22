@@ -137,7 +137,7 @@ def print_eval_metrics_by_class(eval_res, run_name, n):
 
             rows.append([str(label), precision, recall, f"{fmeas:.3f}", confusion_text])
 
-        print(tabulate.tabulate(rows, headers=["label", "p", "r", "f1", "confused with"], tablefmt="simple"))
+        print(tabulate.tabulate(rows, headers=["label", "p", "r", "f1", "Confused with..."], tablefmt="simple"))
 
 
 def main():
