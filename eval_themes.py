@@ -143,13 +143,15 @@ def main():
         eval_res_th = evaluate_themes(preds, theme_refs, range(1, 6), 'theme')
         print(f"Themes ====================")
         print_eval_metrics(eval_res_th)
+        print(f"By label @ 1 --------------")
         print_eval_metrics_by_class(eval_res_th, 'theme', 1)
 
     if 'sub_themes' in first_eval:
         eval_res_sth = evaluate_themes(preds, theme_refs, range(1, 6), 'sub_themes')
         print(f"SubThemes =================")
         print_eval_metrics(eval_res_sth, 1)
-        print_eval_metrics_by_class(eval_res_th, 'theme', 1)
+        print(f"By label @1 ----------------")
+        print_eval_metrics_by_class(eval_res_sth, 'sub_themes', 1)
 
 
 if __name__ == '__main__':
