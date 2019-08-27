@@ -127,7 +127,7 @@ class RDocument:
     @property
     def theme(self) -> dict:
         """
-        :return: A single theme, possibly none. A theme is a dict with keys 'id', 'name', 'codename', 'active'
+        :return: A single theme, possibly None. A theme is a dict with keys 'id', 'name', 'codename', 'active'
         and 'subthemes', a list of subtheme ids loosely followed by Radio-Canada.
         """
         return _theme_dict[int(self._d['ThemeId'])]
